@@ -1,6 +1,6 @@
 {
   "name": "js-object-pretty-print",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Serializes a javascript object to a printable string. String is formatted to be used in either pure text environments, like a console log or in HTML or to create a JSON output.",
   "main": "index.js",
   "scripts": {
