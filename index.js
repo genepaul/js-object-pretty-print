@@ -14,7 +14,7 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
         prettyArray,
         functionSignature,
         pretty,
-        visited;
+        stackSet = new Set();
 
     TOSTRING = Object.prototype.toString;
 
@@ -96,7 +96,7 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
         Object.keys(object).forEach(function (property) {
             value.push(indent + "\"" + property + "\": " + pretty(object[property], indent));
         });
-
+        stackSet.delete(object);
         return value.join(newLineJoin) + newLine;
     };
 
@@ -107,6 +107,7 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
         Object.keys(object).forEach(function (property) {
             value.push(indent + property + ": " + pretty(object[property], indent));
         });
+        stackSet.delete(object);
         return value.join(newLineJoin) + newLine;
     };
 
@@ -119,7 +120,7 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
         for (index = 0; index < length; index += 1) {
             value.push(pretty(array[index], indent, indent));
         }
-
+        stackSet.delete(array);
         return value.join(newLineJoin) + newLine;
     };
 
@@ -139,10 +140,10 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
 
         type = valueType(element);
         fromArray = fromArray || "";
-        if (visited.indexOf(element) === -1) {
+        if (!stackSet.has(element)) {
             switch (type) {
             case "array":
-                visited.push(element);
+                stackSet.add(element);
                 return fromArray + "[" + newLine + prettyArray(element, indent) + indent + "]";
 
             case "boolean":
@@ -155,7 +156,7 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
                 return fromArray + element;
 
             case "object":
-                visited.push(element);
+                stackSet.add(element);
                 return fromArray + "{" + newLine + prettyObject(element, indent) + indent + "}";
 
             case "string":
@@ -190,7 +191,6 @@ module.exports.pretty = function (jsObject, indentLength, outputTo, fullFunction
         prettyObject = outputTo === "print" ? prettyObjectPrint : prettyObjectJSON;
         newLine = outputTo === "html" ? "<br/>" : "\n";
         newLineJoin = "," + newLine;
-        visited = [];
         return pretty(jsObject, "") + newLine;
     }
 

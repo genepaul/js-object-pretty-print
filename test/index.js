@@ -216,3 +216,17 @@ describe('Object serialized with default arguments', function () {
         assert.notEqual(serialized.indexOf('Tue May 25 1954 00:00:00'), -1);
     });
 });
+
+describe('Object serialized with circular references', function () {
+    value.circular = value;
+    value.duplicate = address;
+    var serialized = pretty(value);
+
+    it('Correctly identifies circular key', function () {
+        assert.notEqual(serialized.indexOf('circular: circular reference to [object Object]'), -1);
+    });
+
+    it('Does not misidentify duplicate key', () => {
+        assert.equal(serialized.indexOf('duplicate: circular reference to [object Object]'), -1);
+    });
+})
